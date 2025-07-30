@@ -1,8 +1,6 @@
-# tmuxioner
+# tmuxioner (Tmux Session Manager)
 
-> <u>tmux</u> Sess<u>ion</u> Manag<u>er</u>
-
-A fuzzy tmux session manager with preview capabilities, creating, and deleting.
+A fuzzy <u>tmux</u> sess<u>ion</u> manag<u>er</u> with preview capabilities, creating, and deleting.
 
 ## Prerequisites
 
