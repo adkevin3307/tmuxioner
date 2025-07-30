@@ -14,4 +14,4 @@ function option() {
     echo "$OPTION"
 }
 
-tmux bind-key "$(option "@tmuxioner-key" "T")" run-shell "${DIRECTORY}/scripts/tmuxioner.sh"
+tmux bind-key "$(option "@tmuxioner-key" "T")" run-shell "${DIRECTORY}/scripts/tmuxioner.sh ${DIRECTORY}"
