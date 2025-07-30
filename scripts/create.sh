@@ -2,29 +2,25 @@
 
 export DIRECTORY="$1"
 
-SELECTION=$(__directories=$(fd -H -d 1 -t d -a | sed "s;/$;;" && echo $(realpath ".") && echo $(realpath "..")); printf "%s\n" "${__directories[@]}" | fzf \
-    --tmux 80%,90% \
-    --no-sort \
-    --ansi \
-    --border-label ' tmuxioner ' \
-    --prompt '> ' \
-    --header '^s session' \
-    --bind 'ctrl-s:become(${DIRECTORY}/scripts/tmuxioner.sh "${DIRECTORY}")' \
-    --bind 'tab:reload(cd {}; __directories=$(fd -H -d 1 -t d -a | sed "s;/$;;" && echo $(realpath ".") && echo $(realpath "..")); printf "%s\n" "${__directories[@]}";)' \
-    --preview-window 'right:60%' \
-    --preview 'ls -lha --color=always {}'
-)
+while true; do
+    __directories=$(ls -ap --color=always | grep '/$' | sed 's;/$;;')
+    __directory=$(
+        printf '%s\n' "${__directories[@]}" | fzf \
+            --tmux 80%,90% \
+            --no-sort \
+            --ansi \
+            --border-label ' tmuxioner ' \
+            --prompt '> ' \
+            --header '^s session' \
+            --bind 'tab:down,shift-tab:up' \
+            --bind 'backspace:become(echo ".."; echo "";)' \
+            --bind 'alt-enter:become(tmux has-session -t {} &>/dev/null || tmux new-session -d -s {} -c $(pwd)/{}; tmux switch-client -t {};)' \
+            --bind 'ctrl-s:become(${DIRECTORY}/scripts/tmuxioner.sh "${DIRECTORY}")' \
+            --preview-window 'right:60%' \
+            --preview 'ls -lha --color=always {-1}'
+    )
 
-if [[ -z ${SELECTION} ]]; then
-    exit 0
-fi
+    [[ ${#__directory} != 0 ]] || break
 
-SESSION=$(basename ${SELECTION})
-
-tmux has-session -t ${SESSION} 2>/dev/null
-
-if [[ ! $? == 0 ]]; then
-    tmux new-session -d -c ${SELECTION} -s ${SESSION}
-fi
-
-tmux switch-client -t ${SESSION}
+    builtin cd "${__directory[-1]}" &>/dev/null
+done

@@ -9,6 +9,7 @@ SESSION=$(tmux list-sessions -F \#S | fzf \
     --border-label ' tmux ' \
     --prompt '> ' \
     --header '^n new ^d kill' \
+    --bind 'tab:down,shift-tab:up' \
     --bind 'ctrl-n:become(${DIRECTORY}/scripts/create.sh "${DIRECTORY}")' \
     --bind 'ctrl-d:execute(tmux kill-session -t {})+reload(tmux list-sessions -F \#S)+change-preview(tmux capture-pane -ep -t {})' \
     --preview-window 'right:60%' \
