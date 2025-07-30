@@ -2,7 +2,7 @@
 
 export DIRECTORY="$1"
 
-SELECTION=$(__directories=$(fd -H -d 1 -t d -a | sed "s;/$;;" && echo $(realpath "..")); printf "%s\n" "${__directories[@]}" | fzf \
+SELECTION=$(__directories=$(fd -H -d 1 -t d -a | sed "s;/$;;" && echo $(realpath ".") && echo $(realpath "..")); printf "%s\n" "${__directories[@]}" | fzf \
     --tmux 80%,90% \
     --no-sort \
     --ansi \
@@ -10,7 +10,7 @@ SELECTION=$(__directories=$(fd -H -d 1 -t d -a | sed "s;/$;;" && echo $(realpath
     --prompt '> ' \
     --header '^s session' \
     --bind 'ctrl-s:become(${DIRECTORY}/scripts/tmuxioner.sh "${DIRECTORY}")' \
-    --bind 'tab:reload(cd {}; __directories=$(fd -H -d 1 -t d -a | sed "s;/$;;" && echo $(realpath "..")); printf "%s\n" "${__directories[@]}";)' \
+    --bind 'tab:reload(cd {}; __directories=$(fd -H -d 1 -t d -a | sed "s;/$;;" && echo $(realpath ".") && echo $(realpath "..")); printf "%s\n" "${__directories[@]}";)' \
     --preview-window 'right:60%' \
     --preview 'ls -lha --color=always {}'
 )
