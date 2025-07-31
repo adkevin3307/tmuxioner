@@ -11,7 +11,7 @@ SESSION=$(tmux list-sessions -F \#S | fzf \
     --header '^n new ^d kill' \
     --bind 'tab:down,shift-tab:up' \
     --bind 'ctrl-n:become(${DIRECTORY}/scripts/create.sh "${DIRECTORY}")' \
-    --bind 'ctrl-d:execute(tmux kill-session -t {})+reload(tmux list-sessions -F \#S)+change-preview(tmux capture-pane -ep -t {})' \
+    --bind 'ctrl-d:execute(tmux kill-session -t {})+reload(tmux list-sessions -F \#S)' \
     --preview-window 'right:60%' \
     --preview 'tmux capture-pane -ep -t {}'
 )
