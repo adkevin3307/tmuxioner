@@ -39,29 +39,39 @@ def main() -> None:
     p = subprocess.Popen(['tmux', 'display-message', '-p', '#{window_width}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out, err = p.communicate()
 
-    if len(err) != 0:
-        exit(0)
+    if len(out) == 0 or len(err) != 0:
+        out = f'{os.get_terminal_size().columns}'
+
+    if len(out) == 0:
+        print('ERROR: cannot get window size')
+
+        exit(1)
 
     max_length = int(int(int(out.strip()) * 0.8) * 0.4) - 5
     color = [BLUE, '', GREEN, BLUE, BLUE, BLUE]
 
-    with open('/home/adkevin3307/Projects/test/a.txt', 'a') as txt_file:
-        print(f'{out=}, {max_length=}', file=txt_file)
-
     for entry in entries:
         directory = entry[0]
 
-        while True:
-            _origin_length = len(directory)
-            _encode_length = len(directory.encode())
-            delta = ((_encode_length - _origin_length) if _origin_length != _encode_length else 0) // 2
+        base_length = (sum(length[1:]) + 4)
+        text_length = len(entry[0]) + base_length
 
-            text_length = _origin_length + (sum(length[1:]) + 4) + delta
+        for i in range(len(entry[0]) + 1):
+            directory = entry[0][: (len(entry[0]) - i)]
+
+            origin_length = len(directory)
+            encode_length = len(directory.encode())
+            delta = ((encode_length - origin_length) if origin_length != encode_length else 0) // 2
+
+            text_length = origin_length + base_length + delta
 
             if text_length + 5 < max_length:
                 break
 
-            directory = directory[:-1]
+        if len(directory) == 0:
+            print('ERROR: window width not enough')
+
+            exit(1)
 
         strip = directory != entry[0]
         padding = ' ' * (max_length - text_length - (3 if strip else 0))
