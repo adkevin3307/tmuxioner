@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 
 
 GREEN = f'\033{chr(91)}92m'
@@ -35,8 +36,17 @@ def main() -> None:
 
     length = [max(len(str(entry[i])) for entry in entries) for i in range(6)]
 
-    max_length = 75
+    p = subprocess.Popen(['tmux', 'display-message', '-p', '#{window_width}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    out, err = p.communicate()
+
+    if len(err) != 0:
+        exit(0)
+
+    max_length = int(int(int(out.strip()) * 0.8) * 0.4) - 5
     color = [BLUE, '', GREEN, BLUE, BLUE, BLUE]
+
+    with open('/home/adkevin3307/Projects/test/a.txt', 'a') as txt_file:
+        print(f'{out=}, {max_length=}', file=txt_file)
 
     for entry in entries:
         directory = entry[0]
