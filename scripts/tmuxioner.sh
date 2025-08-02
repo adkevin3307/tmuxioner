@@ -17,7 +17,6 @@ SESSION=$(
         --preview-window 'right:60%' \
         --preview 'tmux capture-pane -ep -t {}'
 )
-        # --bind 'alt-r:execute(printf >&2 "New Name: "; read __name; tmux rename-session -t {} "${__name}";)+reload(tmux list-sessions -F \#S)' \
 
 if [[ -z ${SESSION} ]]; then
     exit 0
