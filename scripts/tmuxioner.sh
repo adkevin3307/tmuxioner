@@ -9,13 +9,15 @@ SESSION=$(
         --ansi \
         --border-label ' tmuxioner ' \
         --prompt '> ' \
-        --header 'C-n new C-d kill' \
+        --header 'A-c create A-r rename A-d kill' \
         --bind 'tab:down,shift-tab:up' \
-        --bind 'ctrl-n:become(${DIRECTORY}/create.sh)' \
-        --bind 'ctrl-d:execute(tmux kill-session -t {})+reload(tmux list-sessions -F \#S)' \
+        --bind 'alt-c:become(${DIRECTORY}/create.sh)' \
+        --bind 'alt-r:become(${DIRECTORY}/rename.sh {})' \
+        --bind 'alt-d:execute(tmux kill-session -t {})+reload(tmux list-sessions -F \#S)' \
         --preview-window 'right:60%' \
         --preview 'tmux capture-pane -ep -t {}'
 )
+        # --bind 'alt-r:execute(printf >&2 "New Name: "; read __name; tmux rename-session -t {} "${__name}";)+reload(tmux list-sessions -F \#S)' \
 
 if [[ -z ${SESSION} ]]; then
     exit 0
