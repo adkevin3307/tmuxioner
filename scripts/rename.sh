@@ -14,4 +14,5 @@ fzf \
     --disabled \
     --ghost 'Session Name' \
     --query "${CURRENT}" \
-    --bind 'enter:execute(tmux rename-session -t "${CURRENT}" {q})+become(${DIRECTORY}/tmuxioner.sh)'
+    --bind 'enter:execute(tmux rename-session -t "${CURRENT}" {q})+become(${DIRECTORY}/tmuxioner.sh)' \
+    --bind 'esc:become(${DIRECTORY}/tmuxioner.sh),ctrl-c:become(${DIRECTORY}/tmuxioner.sh),ctrl-g:become(${DIRECTORY}/tmuxioner.sh),ctrl-q:become(${DIRECTORY}/tmuxioner.sh)'
