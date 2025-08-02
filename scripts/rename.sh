@@ -13,4 +13,4 @@ fzf \
     --no-separator \
     --disabled \
     --ghost 'Session Name' \
-    --bind 'enter:execute(tmux rename-session -t ${CURRENT} {q})+become(${DIRECTORY}/tmuxioner.sh)'
+    --bind 'enter:execute(tmux rename-session -t "${CURRENT}" {q})+become(${DIRECTORY}/tmuxioner.sh)'
