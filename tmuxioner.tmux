@@ -14,4 +14,4 @@ function option() {
     echo "$OPTION"
 }
 
-tmux bind-key "$(option "@tmuxioner-key" "T")" run-shell "${DIRECTORY}/scripts/tmuxioner.sh ${DIRECTORY} $(tmux display-message -p "#{pane_current_path}")"
+tmux bind-key "$(option "@tmuxioner-key" "T")" run-shell "${DIRECTORY}/scripts/tmuxioner.sh"

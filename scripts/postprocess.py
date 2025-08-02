@@ -17,7 +17,10 @@ def main() -> None:
     path = re.match(rf'(.+)\s+{permission}\s+{size}\s+{month}\s+{day}\s+{time}', s)
 
     if path is None:
-        exit(0)
+        exit(1)
+
+    if len(permission) == 0 or len(size) == 0 or len(month) == 0 or len(day) == 0 or len(time) == 0:
+        exit(1)
 
     print(path.group(1).strip())
 
