@@ -10,7 +10,7 @@ SESSION=$(
         --ansi \
         --border-label ' tmux ' \
         --prompt '> ' \
-        --header '^n new ^d kill' \
+        --header 'C-n new C-d kill' \
         --bind 'tab:down,shift-tab:up' \
         --bind 'ctrl-n:become(${DIRECTORY}/scripts/create.sh "${DIRECTORY}" "${CURRENT}")' \
         --bind 'ctrl-d:execute(tmux kill-session -t {})+reload(tmux list-sessions -F \#S)' \

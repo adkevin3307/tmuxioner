@@ -13,7 +13,7 @@ while true; do
             --ansi \
             --border-label ' tmuxioner ' \
             --prompt '> ' \
-            --header '^s session' \
+            --header 'C-s session A-enter create' \
             --bind 'tab:down,shift-tab:up' \
             --bind 'backward-eof:become(echo "..")' \
             --bind 'alt-enter:become(__path=$(realpath $(echo {} | python3 ${DIRECTORY}/scripts/postprocess.py)); __name=$(basename ${__path}); tmux has-session -t ${__name} &>/dev/null || tmux new-session -d -s ${__name} -c ${__path}; tmux switch-client -t ${__name};)' \
