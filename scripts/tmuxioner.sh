@@ -5,6 +5,7 @@ export DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SESSION=$(
     tmux list-sessions -F \#S | fzf \
         --tmux 80%,90% \
+        --no-bold \
         --no-sort \
         --ansi \
         --border-label ' tmuxioner ' \

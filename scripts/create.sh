@@ -8,6 +8,7 @@ while true; do
     __directory=$(
         ls -lhago | python3 ${DIRECTORY}/preprocess.py | fzf \
             --tmux 80%,90% \
+            --no-bold \
             --no-sort \
             --ansi \
             --border-label ' tmuxioner ' \

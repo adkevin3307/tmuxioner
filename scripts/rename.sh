@@ -5,6 +5,7 @@ export CURRENT="$1"
 
 fzf \
     --tmux 30%,10% \
+    --no-bold \
     --no-sort \
     --ansi \
     --border-label ' tmuxioner ' \
