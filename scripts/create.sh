@@ -13,11 +13,11 @@ while true; do
             --ansi \
             --border-label ' tmuxioner ' \
             --prompt '> ' \
-            --header 'A-s session A-enter create' \
+            --header 'A-enter create' \
             --bind 'tab:down,shift-tab:up' \
             --bind 'backward-eof:become(echo "..")' \
             --bind 'alt-enter:become(__path=$(realpath $(echo {} | python3 ${DIRECTORY}/postprocess.py)); __name=$(basename ${__path}); tmux has-session -t ${__name} &>/dev/null || tmux new-session -d -s ${__name} -c ${__path}; tmux switch-client -t ${__name};)' \
-            --bind 'alt-s:become(${DIRECTORY}/tmuxioner.sh)' \
+            --bind 'esc:become(${DIRECTORY}/tmuxioner.sh),ctrl-c:become(${DIRECTORY}/tmuxioner.sh),ctrl-g:become(${DIRECTORY}/tmuxioner.sh),ctrl-q:become(${DIRECTORY}/tmuxioner.sh)' \
             --preview-window 'right:60%' \
             --preview 'ls -lha --color=always $(echo {} | python3 ${DIRECTORY}/postprocess.py)' | python3 ${DIRECTORY}/postprocess.py
     )

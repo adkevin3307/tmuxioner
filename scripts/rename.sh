@@ -4,7 +4,7 @@ export DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export CURRENT="$1"
 
 fzf \
-    --tmux 30%,10% \
+    --tmux 20%,5% \
     --no-bold \
     --no-sort \
     --ansi \
