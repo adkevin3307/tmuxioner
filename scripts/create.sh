@@ -2,27 +2,27 @@
 
 export DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-builtin cd "$(tmux display-message -p "#{pane_current_path}")"
+# popup width and preview width in percentage, the list layout in preprocess.py depends on them
+export WIDTH=80
+export PREVIEW=60
 
-while true; do
-    __directory=$(
-        ls -lhago | python3 ${DIRECTORY}/preprocess.py | fzf \
-            --tmux 80%,90% \
-            --no-bold \
-            --no-sort \
-            --ansi \
-            --border-label ' tmuxioner ' \
-            --prompt '> ' \
-            --header 'A-enter create' \
-            --bind 'tab:down,shift-tab:up' \
-            --bind 'backward-eof:become(echo "..")' \
-            --bind 'alt-enter:become(__path=$(realpath $(echo {} | python3 ${DIRECTORY}/postprocess.py)); __name=$(basename ${__path}); tmux has-session -t ${__name} &>/dev/null || tmux new-session -d -s ${__name} -c ${__path}; tmux switch-client -t ${__name};)' \
-            --bind 'esc:become(${DIRECTORY}/tmuxioner.sh),ctrl-c:become(${DIRECTORY}/tmuxioner.sh),ctrl-g:become(${DIRECTORY}/tmuxioner.sh),ctrl-q:become(${DIRECTORY}/tmuxioner.sh)' \
-            --preview-window 'right:60%' \
-            --preview 'ls -lha --color=always $(echo {} | python3 ${DIRECTORY}/postprocess.py)' | python3 ${DIRECTORY}/postprocess.py
-    )
+# traverse by reloading the list in place instead of restarting fzf, so the popup does not flash
+__list='python3 "${DIRECTORY}/preprocess.py" "${WIDTH}" "$((100 - PREVIEW))"'
 
-    [[ ${#__directory} != 0 ]] || break
-
-    builtin cd "${__directory}" &>/dev/null
-done
+python3 "${DIRECTORY}/preprocess.py" "${WIDTH}" "$((100 - PREVIEW))" "$(tmux display-message -p "#{pane_current_path}")" | fzf \
+    --tmux "${WIDTH}%,90%" \
+    --no-bold \
+    --no-sort \
+    --ansi \
+    --border-label ' tmuxioner ' \
+    --prompt '> ' \
+    --header 'A-enter create' \
+    --delimiter '\t' \
+    --with-nth 2 \
+    --bind 'tab:down,shift-tab:up' \
+    --bind "enter:clear-query+reload-sync(${__list} {1})+first" \
+    --bind "backward-eof:pos(2)+reload-sync(${__list} {1})+first" \
+    --bind 'alt-enter:become("${DIRECTORY}/session.sh" {1})' \
+    --bind 'esc:become("${DIRECTORY}/tmuxioner.sh"),ctrl-c:become("${DIRECTORY}/tmuxioner.sh"),ctrl-g:become("${DIRECTORY}/tmuxioner.sh"),ctrl-q:become("${DIRECTORY}/tmuxioner.sh")' \
+    --preview-window "right:${PREVIEW}%" \
+    --preview 'ls -lha --color=always -- {1}'
