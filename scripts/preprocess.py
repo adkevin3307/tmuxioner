@@ -1,86 +1,123 @@
+import math
 import os
-import re
+import shutil
+import stat
 import subprocess
+import sys
+import time
+import unicodedata
 
 
 GREEN = f'\033{chr(91)}92m'
 BLUE = f'\033{chr(91)}94m'
 RESET = f'\033{chr(91)}0m'
 
+SIX_MONTHS = 182.5 * 24 * 60 * 60
 
-def main() -> None:
-    ss = []
 
-    while True:
-        try:
-            s = input()
+def display_width(s: str) -> int:
+    return sum(0 if unicodedata.combining(c) else 2 if unicodedata.east_asian_width(c) in 'WF' else 1 for c in s)
 
-        except EOFError:
+
+def human_size(size: int) -> str:
+    # same format as `ls -h`
+    if size < 1024:
+        return str(size)
+
+    value = float(size)
+
+    for unit in ['K', 'M', 'G', 'T', 'P']:
+        value /= 1024
+
+        # round up like `ls`, carry to the next unit when it reaches 1024
+        if math.ceil(value) < 1024 or unit == 'P':
             break
 
-        ss.append(s)
+    if math.ceil(value * 10) < 100:
+        return f'{math.ceil(value * 10) / 10:.1f}{unit}'
 
-    entries = []
+    return f'{math.ceil(value)}{unit}'
 
-    for s in ss[1:]:
-        permission, _, size, month, day, time, *_ = s.split()
-        path = re.match(rf'{permission}\s+\d+\s+{size}\s+{month}\s+{day}\s+{time}\s+(.+)', s)
 
-        if path is None:
-            continue
+def modify_time(mtime: float) -> tuple[str, str, str]:
+    # same format as `ls -l`, year instead of time for files older than six months
+    t = time.localtime(mtime)
+    recent = abs(time.time() - mtime) < SIX_MONTHS
 
-        path = path.group(1).strip()
+    return time.strftime('%b', t), str(t.tm_mday), time.strftime('%H:%M', t) if recent else str(t.tm_year)
 
-        if os.path.isdir(path):
-            entries.append((path, permission, size, month, day, time))
 
-    length = [max(len(str(entry[i])) for entry in entries) for i in range(6)]
-
+def window_width() -> int:
     p = subprocess.Popen(['tmux', 'display-message', '-p', '#{window_width}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out, err = p.communicate()
 
-    if len(out) == 0 or len(err) != 0:
-        out = f'{os.get_terminal_size().columns}'
+    if len(out.strip()) == 0 or len(err) != 0:
+        return shutil.get_terminal_size().columns
 
-    if len(out) == 0:
-        print('ERROR: cannot get window size')
+    return int(out.strip())
+
+
+def directories(directory: str) -> list[str]:
+    names = ['.', '..']
+
+    try:
+        with os.scandir(directory) as it:
+            names += sorted(entry.name for entry in it if entry.is_dir())
+
+    except OSError:
+        pass
+
+    return names
+
+
+def main() -> None:
+    # popup width and list width (excluding preview) in percentage, and the directory to list
+    popup_ratio, list_ratio = (int(arg) for arg in sys.argv[1:3])
+    directory = os.path.abspath(sys.argv[3] if len(sys.argv) > 3 else '.')
+
+    entries = []
+
+    for name in directories(directory):
+        # logical path like `cd`, '..' of a symlinked directory goes back to where it was entered from
+        path = os.path.normpath(os.path.join(directory, name))
+
+        if '\t' in path or '\n' in path:
+            continue
+
+        try:
+            st = os.stat(path)
+
+        except OSError:
+            continue
+
+        entries.append((path, name, stat.filemode(st.st_mode), human_size(st.st_size), *modify_time(st.st_mtime)))
+
+    length = [max(len(entry[i]) for entry in entries) for i in range(2, 6 + 1)]
+
+    line_length = int(int(window_width() * popup_ratio / 100) * list_ratio / 100) - 5
+    name_length = line_length - (sum(length) + len(length))
+
+    if name_length < 4:
+        print('\tERROR: window width not enough')
 
         exit(1)
 
-    max_length = int(int(int(out.strip()) * 0.8) * 0.4) - 5
-    color = [BLUE, '', GREEN, BLUE, BLUE, BLUE]
+    color = ['', GREEN, BLUE, BLUE, BLUE]
 
     for entry in entries:
-        directory = entry[0]
+        name = entry[1]
 
-        base_length = (sum(length[1:]) + 4)
-        text_length = len(entry[0]) + base_length
+        if display_width(name) > name_length:
+            while display_width(name) + 3 > name_length:
+                name = name[:-1]
 
-        for i in range(len(entry[0]) + 1):
-            directory = entry[0][: (len(entry[0]) - i)]
+            name += '...'
 
-            origin_length = len(directory)
-            encode_length = len(directory.encode())
-            delta = ((encode_length - origin_length) if origin_length != encode_length else 0) // 2
+        padding = ' ' * (name_length - display_width(name))
+        postfix = ' '.join([f'{_color}{_entry:>{_length}}{RESET}' for _color, _entry, _length in zip(color, entry[2:], length)])
 
-            text_length = origin_length + base_length + delta
-
-            if text_length + 5 < max_length:
-                break
-
-        if len(directory) == 0:
-            print('ERROR: window width not enough')
-
-            exit(1)
-
-        strip = directory != entry[0]
-        padding = ' ' * (max_length - text_length - (3 if strip else 0))
-
-        prefix = f'{color[0]}{directory}{"..." if strip else ""}{RESET}'
-        postfix = ' '.join([f'{_color}{_entry:>{_length}}{RESET}' for _color, _entry, _length in zip(color[1:], entry[1:], length[1:])])
-
-        s = prefix + padding + postfix
-        print(s)
+        # first field is the absolute path, hidden from fzf by --with-nth
+        print(f'{entry[0]}\t{BLUE}{name}{RESET}{padding} {postfix}')
 
 
 if __name__ == '__main__':

@@ -4,8 +4,10 @@ A fuzzy <ins>tmux</ins> sess<ins>ion</ins> manag<ins>er</ins> with preview capab
 
 ## Prerequisites
 
+- [tmux](https://github.com/tmux/tmux) >= 3.3
 - [tpm](https://github.com/tmux-plugins/tpm)
-- [fzf](https://github.com/junegunn/fzf)
+- [fzf](https://github.com/junegunn/fzf) >= 0.61
+- python3
 
 ## Install
 
