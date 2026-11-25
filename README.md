@@ -4,7 +4,7 @@ A fuzzy <ins>tmux</ins> sess<ins>ion</ins> manag<ins>er</ins> with preview capab
 
 ## Prerequisites
 
-- [tmux](https://github.com/tmux/tmux) >= 3.3
+- [tmux](https://github.com/tmux/tmux) >= 3.3 (3.8+ keeps the picker on screen under the rename and kill popups)
 - [tpm](https://github.com/tmux-plugins/tpm)
 - [fzf](https://github.com/junegunn/fzf) >= 0.65
 - python3

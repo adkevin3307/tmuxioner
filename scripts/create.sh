@@ -2,21 +2,16 @@
 
 export DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# popup width and preview width in percentage, the list layout in preprocess.py depends on them
-export WIDTH=80
+# preview width in percentage, the list layout in preprocess.py depends on it
 export PREVIEW=60
 
-# traverse by reloading the list in place instead of restarting fzf, so the popup does not flash
-__list='python3 "${DIRECTORY}/preprocess.py" "${WIDTH}" "$((100 - PREVIEW))"'
+# traverse by reloading the list in place instead of restarting fzf, so the picker does not flash
+__list='python3 "${DIRECTORY}/preprocess.py" "$((100 - PREVIEW))"'
 
-# restyle the popup from inside with the terminal colours instead of popup-style, so the background is transparent
-
-python3 "${DIRECTORY}/preprocess.py" "${WIDTH}" "$((100 - PREVIEW))" "$(tmux display-message -p "#{pane_current_path}")" | fzf \
-    --tmux "${WIDTH}%,90%" \
+python3 "${DIRECTORY}/preprocess.py" "$((100 - PREVIEW))" "$(tmux display-message -p "#{pane_current_path}")" | fzf \
     --no-bold \
     --no-sort \
     --ansi \
-    --border none \
     --input-border rounded \
     --list-border rounded \
     --preview-border rounded \
@@ -31,7 +26,6 @@ python3 "${DIRECTORY}/preprocess.py" "${WIDTH}" "$((100 - PREVIEW))" "$(tmux dis
     --prompt '> ' \
     --delimiter '\t' \
     --with-nth 2 \
-    --bind 'start:execute-silent(tmux display-popup -s "bg=terminal,fg=terminal")' \
     --bind 'tab:down,shift-tab:up' \
     --bind "enter:clear-query+reload-sync(${__list} {1})+first" \
     --bind "backward-eof:pos(2)+reload-sync(${__list} {1})+first" \

@@ -2,7 +2,6 @@ import math
 import os
 import shutil
 import stat
-import subprocess
 import sys
 import time
 import unicodedata
@@ -47,14 +46,14 @@ def modify_time(mtime: float) -> tuple[str, str, str]:
     return time.strftime('%b', t), str(t.tm_mday), time.strftime('%H:%M', t) if recent else str(t.tm_year)
 
 
-def window_width() -> int:
-    p = subprocess.Popen(['tmux', 'display-message', '-p', '#{window_width}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    out, err = p.communicate()
+def terminal_width() -> int:
+    # the pane or popup fzf runs in, stdout is a pipe to fzf
+    try:
+        with open('/dev/tty') as tty:
+            return os.get_terminal_size(tty.fileno()).columns
 
-    if len(out.strip()) == 0 or len(err) != 0:
+    except OSError:
         return shutil.get_terminal_size().columns
-
-    return int(out.strip())
 
 
 def directories(directory: str) -> list[str]:
@@ -71,9 +70,9 @@ def directories(directory: str) -> list[str]:
 
 
 def main() -> None:
-    # popup width and list width (excluding preview) in percentage, and the directory to list
-    popup_ratio, list_ratio = (int(arg) for arg in sys.argv[1:3])
-    directory = os.path.abspath(sys.argv[3] if len(sys.argv) > 3 else '.')
+    # list width (excluding preview) in percentage, and the directory to list
+    list_ratio = int(sys.argv[1])
+    directory = os.path.abspath(sys.argv[2] if len(sys.argv) > 2 else '.')
 
     entries = []
 
@@ -95,7 +94,7 @@ def main() -> None:
     length = [max(len(entry[i]) for entry in entries) for i in range(2, 6 + 1)]
 
     # list border, padding and pointer take 6 columns
-    line_length = int(int(window_width() * popup_ratio / 100) * list_ratio / 100) - 6
+    line_length = int(terminal_width() * list_ratio / 100) - 6
     name_length = line_length - (sum(length) + len(length))
 
     if name_length < 4:
