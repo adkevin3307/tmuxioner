@@ -9,6 +9,7 @@ else
     __header="Kill session '${TARGET}'?"
 fi
 
+# restyle the popup from inside with the terminal colours instead of popup-style, so the background is transparent
 __answer=$(
     printf 'No\nYes\n' | fzf \
         --tmux 40%,7 \
@@ -26,6 +27,7 @@ __answer=$(
         --input-label ' Kill Session ' \
         --list-label " ${__header} " \
         --prompt '> ' \
+        --bind 'start:execute-silent(tmux display-popup -s "bg=terminal,fg=terminal")' \
         --bind 'tab:down,shift-tab:up'
 )
 

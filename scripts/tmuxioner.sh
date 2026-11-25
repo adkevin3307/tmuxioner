@@ -15,6 +15,7 @@ export SEARCH_MODE="enable-search+clear-query+change-ghost()+change-input-label(
 __enter='transform:if [ "${FZF_INPUT_STATE}" = disabled ]; then "${DIRECTORY}/rename.sh"; else echo accept; fi'
 __cancel='transform:if [ "${FZF_INPUT_STATE}" = disabled ]; then printf %s "${SEARCH_MODE}"; else echo abort; fi'
 
+# restyle the popup from inside with the terminal colours instead of popup-style, so the background is transparent
 SESSION=$(
     tmux list-sessions -F \#S | fzf \
         --tmux 80%,90% \
@@ -34,6 +35,7 @@ SESSION=$(
         --list-label "${__hints}" \
         --list-label-pos 0:bottom \
         --prompt '> ' \
+        --bind 'start:execute-silent(tmux display-popup -s "bg=terminal,fg=terminal")' \
         --bind 'tab:down,shift-tab:up' \
         --bind 'alt-c:become("${DIRECTORY}/create.sh")' \
         --bind 'alt-m:become("${DIRECTORY}/session.sh" "${HOME}" "$(tr -dc "A-Za-z0-9" < /dev/urandom | head -c 10)")' \
