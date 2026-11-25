@@ -1,28 +1,19 @@
 #!/bin/bash
 
-export DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export CURRENT="$1"
+# Usage: called by the fzf transform on enter in rename mode of tmuxioner.sh, prints the fzf actions to run next
+# The query is the new name and the ghost text is the session to rename
 
-# fit the name in a single line (border, padding, prompt and cursor take 7 columns), between 20% and 80% of the window
-__window_width="$(tmux display-message -p '#{window_width}')"
-__width="$(( $(printf '%s' "${CURRENT}" | wc -L) + 7 ))"
-__width="$(( __width < __window_width * 20 / 100 ? __window_width * 20 / 100 : __width ))"
-__width="$(( __width > __window_width * 80 / 100 ? __window_width * 80 / 100 : __width ))"
+__id="$(tmux display-message -p -t "=${FZF_GHOST}:" '#{session_id}')"
 
-# height 3 is the input section only, a single line of input with its border
-fzf < /dev/null \
-    --tmux "${__width},3" \
-    --no-bold \
-    --no-sort \
-    --ansi \
-    --border none \
-    --input-border rounded \
-    --input-label ' Rename Session ' \
-    --prompt '> ' \
-    --no-info \
-    --no-separator \
-    --disabled \
-    --ghost 'Session Name' \
-    --query "${CURRENT}" \
-    --bind 'enter:execute([ -n {q} ] && tmux rename-session -t "=${CURRENT}" {q})+become("${DIRECTORY}/tmuxioner.sh")' \
-    --bind 'esc:become("${DIRECTORY}/tmuxioner.sh"),ctrl-c:become("${DIRECTORY}/tmuxioner.sh"),ctrl-g:become("${DIRECTORY}/tmuxioner.sh"),ctrl-q:become("${DIRECTORY}/tmuxioner.sh")'
+if [[ -n "${FZF_QUERY}" && "${FZF_QUERY}" != "${FZF_GHOST}" ]]; then
+    # stay in rename mode and show why tmux refuses the name, e.g. a duplicate session
+    if ! __error="$(tmux rename-session -t "=${FZF_GHOST}" -- "${FZF_QUERY}" 2>&1)"; then
+        printf 'change-list-label: %s ' "${__error}"
+        exit 0
+    fi
+fi
+
+# back to search mode on the renamed session, follow it by id since its position in the list may change
+__position="$(tmux list-sessions -F '#{session_id}' | grep -nxF -- "${__id}" | cut -d: -f1)"
+
+printf '%s+reload-sync(tmux list-sessions -F "#S")+pos(%s)' "${SEARCH_MODE}" "${__position:-1}"
