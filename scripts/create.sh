@@ -14,9 +14,19 @@ python3 "${DIRECTORY}/preprocess.py" "${WIDTH}" "$((100 - PREVIEW))" "$(tmux dis
     --no-bold \
     --no-sort \
     --ansi \
-    --border-label ' tmuxioner ' \
+    --border none \
+    --input-border rounded \
+    --list-border rounded \
+    --preview-border rounded \
+    --info inline-right \
+    --no-scrollbar \
+    --highlight-line \
+    --pointer '>' \
+    --gutter ' ' \
+    --input-label ' Create Session ' \
+    --list-label ' A-enter create ' \
+    --list-label-pos 0:bottom \
     --prompt '> ' \
-    --header 'A-enter create' \
     --delimiter '\t' \
     --with-nth 2 \
     --bind 'tab:down,shift-tab:up' \
@@ -24,5 +34,6 @@ python3 "${DIRECTORY}/preprocess.py" "${WIDTH}" "$((100 - PREVIEW))" "$(tmux dis
     --bind "backward-eof:pos(2)+reload-sync(${__list} {1})+first" \
     --bind 'alt-enter:become("${DIRECTORY}/session.sh" {1})' \
     --bind 'esc:become("${DIRECTORY}/tmuxioner.sh"),ctrl-c:become("${DIRECTORY}/tmuxioner.sh"),ctrl-g:become("${DIRECTORY}/tmuxioner.sh"),ctrl-q:become("${DIRECTORY}/tmuxioner.sh")' \
+    --bind 'focus:transform-preview-label:printf " %s " {1}' \
     --preview-window "right:${PREVIEW}%" \
     --preview 'ls -lha --color=always -- {1}'

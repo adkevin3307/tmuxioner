@@ -11,14 +11,21 @@ fi
 
 __answer=$(
     printf 'No\nYes\n' | fzf \
-        --tmux 40%,20% \
+        --tmux 40%,7 \
         --no-bold \
         --no-sort \
         --ansi \
-        --border-label ' tmuxioner ' \
-        --prompt '> ' \
+        --border none \
+        --input-border rounded \
+        --list-border rounded \
         --no-info \
-        --header "${__header}" \
+        --no-scrollbar \
+        --highlight-line \
+        --pointer '>' \
+        --gutter ' ' \
+        --input-label ' Kill Session ' \
+        --list-label " ${__header} " \
+        --prompt '> ' \
         --bind 'tab:down,shift-tab:up'
 )
 

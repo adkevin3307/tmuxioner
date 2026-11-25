@@ -3,19 +3,21 @@
 export DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export CURRENT="$1"
 
-# fit the name in a single line (border, margin, prompt and cursor take 9 columns), between 20% and 80% of the window
+# fit the name in a single line (border, padding, prompt and cursor take 7 columns), between 20% and 80% of the window
 __window_width="$(tmux display-message -p '#{window_width}')"
-__width="$(( $(printf '%s' "${CURRENT}" | wc -L) + 9 ))"
+__width="$(( $(printf '%s' "${CURRENT}" | wc -L) + 7 ))"
 __width="$(( __width < __window_width * 20 / 100 ? __window_width * 20 / 100 : __width ))"
 __width="$(( __width > __window_width * 80 / 100 ? __window_width * 80 / 100 : __width ))"
 
-# height 5 is the minimum of fzf, a single line of input
+# height 3 is the input section only, a single line of input with its border
 fzf < /dev/null \
-    --tmux "${__width},5" \
+    --tmux "${__width},3" \
     --no-bold \
     --no-sort \
     --ansi \
-    --border-label ' tmuxioner ' \
+    --border none \
+    --input-border rounded \
+    --input-label ' Rename Session ' \
     --prompt '> ' \
     --no-info \
     --no-separator \

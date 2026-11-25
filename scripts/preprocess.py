@@ -94,7 +94,8 @@ def main() -> None:
 
     length = [max(len(entry[i]) for entry in entries) for i in range(2, 6 + 1)]
 
-    line_length = int(int(window_width() * popup_ratio / 100) * list_ratio / 100) - 5
+    # list border, padding and pointer take 6 columns
+    line_length = int(int(window_width() * popup_ratio / 100) * list_ratio / 100) - 6
     name_length = line_length - (sum(length) + len(length))
 
     if name_length < 4:
