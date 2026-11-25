@@ -61,6 +61,7 @@ else
     __kill='execute-silent(printf "kill\n%s\n" {} > "${TMUXIONER_NEXT}")+abort'
 fi
 
+# rounded boxes with the cyan border of Telescope in onedark
 SESSION=$(
     tmux list-sessions -F \#S | fzf \
         --no-bold \
@@ -69,6 +70,7 @@ SESSION=$(
         --input-border rounded \
         --list-border rounded \
         --preview-border rounded \
+        --color 'border:#56b6c2' \
         --info inline-right \
         --no-scrollbar \
         --highlight-line \

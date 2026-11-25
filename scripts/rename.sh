@@ -21,6 +21,7 @@ if [[ "$1" == --popup ]]; then
         --disabled \
         --no-info \
         --border rounded \
+        --color 'border:#56b6c2' \
         --border-label ' Rename Session ' \
         --prompt '> ' \
         --query "${TARGET}" \

@@ -15,6 +15,7 @@ python3 "${DIRECTORY}/preprocess.py" "$((100 - PREVIEW))" "$(tmux display-messag
     --input-border rounded \
     --list-border rounded \
     --preview-border rounded \
+    --color 'border:#56b6c2' \
     --info inline-right \
     --no-scrollbar \
     --highlight-line \

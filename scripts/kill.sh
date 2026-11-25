@@ -14,6 +14,7 @@ if [[ "$1" == --popup ]]; then
             --ansi \
             --input-border rounded \
             --list-border rounded \
+            --color 'border:#56b6c2' \
             --no-info \
             --no-scrollbar \
             --highlight-line \
